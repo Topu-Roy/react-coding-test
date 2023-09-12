@@ -18,7 +18,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body className={`${inter.className}`}>
         <Providers>
           <main className="dark:bg-gray-950/50 bg-stone-100">
             <ThemeSwitcher />
