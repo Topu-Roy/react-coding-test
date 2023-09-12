@@ -1,4 +1,4 @@
-const options = [
+export const options = [
   { value: "1", label: "Manufacturing" },
   { value: "19", label: "Construction materials" },
   { value: "18", label: "Electronics and Optics" },
