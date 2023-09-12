@@ -2,27 +2,19 @@
 
 import { useState, useEffect } from 'react'
 import { useTheme } from 'next-themes'
-import { SunIcon } from './SunIcon'
-import { MoonIcon } from './MoonIcon'
-import { VisuallyHidden, useSwitch } from '@nextui-org/react'
+import { Tab, Tabs } from '@nextui-org/react'
 
 const ThemeSwitcher = () => {
-    const {
-        Component,
-        slots,
-        isSelected,
-        getBaseProps,
-        getInputProps,
-        getWrapperProps
-    } = useSwitch();
     const [mounted, setMounted] = useState(false)
-    const { theme, setTheme } = useTheme()
+    const [selected, setSelected] = useState("photos");
+    const { setTheme } = useTheme()
 
     // useEffect only runs on the client, so now we can safely show the UI
 
     useEffect(() => {
-        isSelected ? setTheme('light') : setTheme('dark')
-    }, [isSelected])
+        setTheme(selected)
+    }, [selected])
+
     useEffect(() => {
         setMounted(true)
     }, [])
@@ -32,24 +24,19 @@ const ThemeSwitcher = () => {
     }
 
     return (
-        <div className="absolute top-0 right-0">
-            <Component {...getBaseProps()}>
-                <VisuallyHidden>
-                    <input {...getInputProps()} />
-                </VisuallyHidden>
-                <div
-                    {...getWrapperProps()}
-                    className={slots.wrapper({
-                        class: [
-                            "w-8 h-8",
-                            "flex items-center justify-center",
-                            "rounded-lg bg-default-100 hover:bg-default-200",
-                        ],
-                    })}
-                >
-                    {isSelected ? <SunIcon /> : <MoonIcon />}
-                </div>
-            </Component>
+        <div className="w-full flex justify-center items-center pt-2">
+            <Tabs
+                variant='bordered'
+                aria-label="Tabs colors"
+                selectedKey={selected}
+                onSelectionChange={setSelected}
+                radius="full"
+                color='default'
+            >
+                <Tab key="system" title="System" />
+                <Tab key="light" title="Light" />
+                <Tab key="dark" title="Dark" />
+            </Tabs>
         </div>
     )
 }
