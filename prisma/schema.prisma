@@ -21,3 +21,9 @@ model Sector {
   user    User @relation(fields: [userId], references: [id])
   userId  String @unique @db.ObjectId
 }
+
+model AllSector {
+  id      String @id @default(auto()) @map("_id") @db.ObjectId
+  value   Int @unique
+  label   String
+}
