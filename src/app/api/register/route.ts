@@ -15,8 +15,12 @@ export const POST = async (req: Request) => {
     await prisma.user.create({
       data: {
         name,
-        sector,
         acceptedTerms,
+        sector: {
+          connect: {
+            id: sector,
+          },
+        },
       },
     });
 

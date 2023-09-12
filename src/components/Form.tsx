@@ -12,6 +12,7 @@ const Form = () => {
     };
 
     type OptionsType = {
+        id: string;
         value: number;
         label: string;
     }[]
@@ -47,13 +48,17 @@ const Form = () => {
 
     // * Form submission handler
     const onSubmit: SubmitHandler<Inputs> = async (data) => {
-        const { name, sector, acceptedTerms } = data;
+
+        // * getting the id of the sector from the object
+        const optionObject = options.find(option => option.label === data.sector)
+
+        const { name, acceptedTerms } = data;
         try {
             await fetch('/api/register', {
                 method: 'POST',
                 body: JSON.stringify({
                     name,
-                    sector,
+                    sector: optionObject?.id,
                     acceptedTerms
                 })
             })
@@ -63,6 +68,10 @@ const Form = () => {
         console.log(data)
         reset();
     }
+
+
+    // console.log(options)
+
     return (
         <>
             <span className="font-bold text-2xl pb-8">

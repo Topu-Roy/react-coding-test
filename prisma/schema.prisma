@@ -9,7 +9,7 @@ datasource db {
 
 model Sector {
   id      String @id @default(auto()) @map("_id") @db.ObjectId
-  value   Int    @unique
+  value   Int @unique
   label   String
   user    User[]
 }
@@ -20,10 +20,4 @@ model User {
   acceptedTerms Boolean
   sector        Sector   @relation(fields: [sectorId], references: [id])
   sectorId      String @db.ObjectId
-}
-
-model AllSector {
-  id      String @id @default(auto()) @map("_id") @db.ObjectId
-  value   Int @unique
-  label   String
 }

@@ -6,13 +6,14 @@ export async function GET() {
     await prisma.$connect();
 
     // * Fetches fields that are specified
-    const allSectors = await prisma.allSector.findMany({
+    const allSectors = await prisma.sector.findMany({
       select: {
+        id: true,
         label: true,
         value: true,
       },
     });
-    console.log(allSectors);
+    // console.log(allSectors);
     return NextResponse.json(allSectors, { status: 200 });
   } catch (error) {
     console.log(error);
