@@ -64,7 +64,6 @@ const Form = () => {
                             />
                             <label
                                 htmlFor="link-checkbox"
-                                // className={`${errors.acceptedTerms ? 'text-red-600/80' : 'text-gray-900/80'} `}
                                 className="ml-2 flex gap-1 justify-center items-center text-sm font-medium  dark:text-gray-300 text-gray-900/80"
                             >
                                 {errors?.acceptedTerms ? (
