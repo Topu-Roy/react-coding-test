@@ -1,15 +1,20 @@
 "use client";
-import { options } from "@/constants";
 import { Button, Card, Input, Select, SelectItem } from "@nextui-org/react";
-import React, { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 
 const Form = () => {
+    const [options, setOptions] = useState<OptionsType>([])
     type Inputs = {
         name: string;
         sector: string;
         acceptedTerms: boolean;
     };
+
+    type OptionsType = {
+        value: number;
+        label: string;
+    }[]
 
     const {
         register,
@@ -18,18 +23,29 @@ const Form = () => {
         formState: { errors, isSubmitting, isSubmitted },
     } = useForm<Inputs>();
 
-    async function fetchAllSectors() {
-        const data = await fetch('/api/getAllSectors', {
-            method: 'GET',
-        })
-        console.log(data)
-    }
 
+
+    // * Fetching the data from the database
     useEffect(() => {
+        async function fetchAllSectors() {
+            try {
+                const response = await fetch('/api/getAllSectors');
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                const result = await response.json();
+
+                // * Setting the state
+                setOptions(result);
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        }
         fetchAllSectors();
     }, [])
 
 
+    // * Form submission handler
     const onSubmit: SubmitHandler<Inputs> = async (data) => {
         const { name, sector, acceptedTerms } = data;
         try {
