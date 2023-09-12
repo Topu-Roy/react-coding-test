@@ -1,7 +1,7 @@
 "use client";
 import { options } from "@/constants";
 import { Button, Card, Input, Select, SelectItem } from "@nextui-org/react";
-import React from "react";
+import React, { useEffect } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 
 const Form = () => {
@@ -18,21 +18,31 @@ const Form = () => {
         formState: { errors, isSubmitting, isSubmitted },
     } = useForm<Inputs>();
 
-    const onSubmit: SubmitHandler<Inputs> = async (data) => {
-        try {
-            const response = await fetch("/api/register", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(data)
-            });
+    async function fetchAllSectors() {
+        const data = await fetch('/api/getAllSectors', {
+            method: 'GET',
+        })
+        console.log(data)
+    }
 
-            if (response.ok) {
-                console.log('data sent successfully')
-            }
+    useEffect(() => {
+        fetchAllSectors();
+    }, [])
+
+
+    const onSubmit: SubmitHandler<Inputs> = async (data) => {
+        const { name, sector, acceptedTerms } = data;
+        try {
+            await fetch('/api/register', {
+                method: 'POST',
+                body: JSON.stringify({
+                    name,
+                    sector,
+                    acceptedTerms
+                })
+            })
         } catch (error) {
-            console.log('something went wrong')
+            console.log('something went wrong', error);
         }
         console.log(data)
         reset();

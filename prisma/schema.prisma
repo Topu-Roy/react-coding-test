@@ -7,19 +7,19 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id            String @id @default(auto()) @map("_id") @db.ObjectId
-  name          String
-  acceptedTerms Boolean
-  sector        Sector?
-}
-
 model Sector {
   id      String @id @default(auto()) @map("_id") @db.ObjectId
   value   Int    @unique
   label   String
-  user    User @relation(fields: [userId], references: [id])
-  userId  String @unique @db.ObjectId
+  user    User[]
+}
+
+model User {
+  id            String @id @default(auto()) @map("_id") @db.ObjectId
+  name          String
+  acceptedTerms Boolean
+  sector        Sector   @relation(fields: [sectorId], references: [id])
+  sectorId      String @db.ObjectId
 }
 
 model AllSector {
