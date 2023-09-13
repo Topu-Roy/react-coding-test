@@ -1,9 +1,16 @@
+import { InputsForAPI } from "@/components/Form";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
 type userStoreType = {
-  id: string;
-  setId: (id: string) => void;
+  obj: InputsForAPI;
+  setObj: ({ name, sectorId, acceptedTerms }: InputsForAPI) => void;
+};
+
+const initialObj: InputsForAPI = {
+  name: "",
+  sectorId: "",
+  acceptedTerms: false,
 };
 
 export const useUserStore = create<
@@ -12,11 +19,11 @@ export const useUserStore = create<
 >(
   persist(
     (set) => ({
-      id: "",
-      setId: (id) => set(() => ({ id })),
+      obj: initialObj,
+      setObj: (obj) => set(() => ({ obj })),
     }),
     {
-      name: "userId",
+      name: "user",
     }
   )
 );

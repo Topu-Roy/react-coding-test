@@ -1,12 +1,12 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { prisma } from "../../../../prisma/prismaClient";
 
-export const POST = async (req: NextRequest) => {
-  const userId = req.nextUrl.searchParams.get("userId");
+export const POST = async (req: Request) => {
+  const { name, sectorId } = await req.json();
 
-  if (!userId) {
+  if (!name || !sectorId) {
     return NextResponse.json(
-      { message: "userId is required" },
+      { message: "name, sectorId is required" },
       { status: 500 }
     );
   }
@@ -15,22 +15,33 @@ export const POST = async (req: NextRequest) => {
     await prisma.$connect();
     const user = await prisma.user.findFirst({
       where: {
-        id: userId.toString(),
+        name: name.toString(),
+        sectorId: sectorId.toString(),
       },
     });
 
-    if (user) {
-      const sectorId = user.sectorId;
-      const sector = await prisma.sector.findUnique({
-        where: {
-          id: sectorId,
-        },
-      });
-      return NextResponse.json({
-        user,
-        sector,
-      });
-    }
+    if (!user)
+      return NextResponse.json(
+        { message: "couldn't find user" },
+        { status: 404 }
+      );
+
+    const sector = await prisma.sector.findUnique({
+      where: {
+        id: user.sectorId,
+      },
+    });
+
+    if (!sector)
+      return NextResponse.json(
+        { message: "couldn't find sector" },
+        { status: 404 }
+      );
+
+    return NextResponse.json({
+      user,
+      sector,
+    });
   } catch (error) {
     return NextResponse.json(
       { message: "Failed to receive data from the database", error },

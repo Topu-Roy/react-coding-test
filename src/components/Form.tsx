@@ -14,7 +14,7 @@ type Inputs = {
     acceptedTerms: boolean;
 };
 
-type InputsForAPI = {
+export type InputsForAPI = {
     name: string;
     sectorId: string;
     acceptedTerms: boolean;
@@ -32,13 +32,13 @@ const Form = () => {
     const [formData, setFormData] = useState<InputsForAPI>();
     const [isRedirect, setIsRedirect] = useState(false);
 
-    const { id, setId } = useUserStore();
+    const { obj, setObj } = useUserStore();
 
     const {
         register,
         handleSubmit,
         reset,
-        formState: { errors, isSubmitting, isSubmitted },
+        formState: { errors, isSubmitted },
     } = useForm<Inputs>();
 
     // * Fetching the data from the database
@@ -114,7 +114,11 @@ const Form = () => {
             if (response.ok) {
 
                 // * setting the id into local storage
-                formData && setId(formData.sectorId)
+                formData && setObj({
+                    name: formData.name,
+                    sectorId: formData.sectorId,
+                    acceptedTerms: formData.acceptedTerms
+                })
                 toast('Added Successfully',
                     {
                         icon: '👏',
@@ -147,8 +151,8 @@ const Form = () => {
         // * Redirect if new user is created
         if (isRedirect) redirect('/home');
 
-        // * Redirect id is present in the local storage
-        if (id !== '') redirect('/home');
+        // * Redirect if id is present in the local storage
+        if (obj.name !== '' && obj.sectorId !== '' && obj === undefined) redirect('/home');
 
     }, [isRedirect])
 
