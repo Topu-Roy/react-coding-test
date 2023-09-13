@@ -1,5 +1,5 @@
 'use client'
-import { Button } from "@nextui-org/react"
+import { Button, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from "@nextui-org/react"
 import { useUserStore } from "@/zustand/userStore"
 import { useEffect, useState } from "react"
 import { redirect } from "next/navigation"
@@ -64,26 +64,41 @@ function page() {
     }, [myObj])
 
     return (
-        <div className="flex justify-center flex-col items-center">
+        <div className="flex justify-center min-h-screen flex-col items-center">
             <Button onClick={handelClick}>
                 Delete from local storage
             </Button>
             {user ? (
-                <div>
-                    <h2>User</h2>
-                    <p>ID: {user.user?.id}</p>
-                    <p>Name: {user.user?.name}</p>
-                    <p>Sector Name: {user.user?.sectorName}</p>
-                    <p>acceptedTerms: {user.user?.acceptedTerms ? 'true' : 'false'}</p>
-
-                    <h2>Sector</h2>
-                    <p>Sector ID: {user.sector?.id}</p>
-                    <p>Sector Name: {user.sector?.label}</p>
-                    <p>Sector Value: {user.sector?.value}</p>
+                <div className="max-w-7xl">
+                    <Table aria-label="User Data Table">
+                        <TableHeader>
+                            <TableColumn>Fields</TableColumn>
+                            <TableColumn>Values</TableColumn>
+                        </TableHeader>
+                        <TableBody>
+                            <TableRow key="1">
+                                <TableCell>Name</TableCell>
+                                <TableCell>{user.user?.name}</TableCell>
+                            </TableRow>
+                            <TableRow key="2">
+                                <TableCell>Terms & Conditions</TableCell>
+                                <TableCell>{user.user?.acceptedTerms ? 'Accepted' : 'Rejected'}</TableCell>
+                            </TableRow>
+                            <TableRow key="3">
+                                <TableCell>Sector</TableCell>
+                                <TableCell>{user.sector?.label}</TableCell>
+                            </TableRow>
+                            <TableRow key="4">
+                                <TableCell>Sector Value</TableCell>
+                                <TableCell>{user.sector?.value}</TableCell>
+                            </TableRow>
+                        </TableBody>
+                    </Table>
                 </div>
             ) : (
                 <p>Loading user data...</p>
             )}
+
         </div>
     )
 }
