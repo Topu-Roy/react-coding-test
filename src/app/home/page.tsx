@@ -1,5 +1,5 @@
 'use client'
-import { Button, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from "@nextui-org/react"
+import { Button, Card, CardBody, CardFooter, CardHeader, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure } from "@nextui-org/react"
 import { useUserStore } from "@/zustand/userStore"
 import { useEffect, useState } from "react"
 import { redirect } from "next/navigation"
@@ -16,8 +16,9 @@ function page() {
     const [user, setUser] = useState<UserDataType>()
     const { setObj, obj } = useUserStore()
     let myObj: InputsForAPI | undefined;
+    const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
-    function handelClick() {
+    function resetLocalStorage() {
         setObj({
             name: '',
             sectorId: '',
@@ -65,35 +66,81 @@ function page() {
 
     return (
         <div className="flex justify-center min-h-screen flex-col items-center">
-            <Button onClick={handelClick}>
-                Delete from local storage
-            </Button>
             {user ? (
                 <div className="max-w-7xl">
-                    <Table aria-label="User Data Table">
-                        <TableHeader>
-                            <TableColumn>Fields</TableColumn>
-                            <TableColumn>Values</TableColumn>
-                        </TableHeader>
-                        <TableBody>
-                            <TableRow key="1">
-                                <TableCell>Name</TableCell>
-                                <TableCell>{user.user?.name}</TableCell>
-                            </TableRow>
-                            <TableRow key="2">
-                                <TableCell>Terms & Conditions</TableCell>
-                                <TableCell>{user.user?.acceptedTerms ? 'Accepted' : 'Rejected'}</TableCell>
-                            </TableRow>
-                            <TableRow key="3">
-                                <TableCell>Sector</TableCell>
-                                <TableCell>{user.sector?.label}</TableCell>
-                            </TableRow>
-                            <TableRow key="4">
-                                <TableCell>Sector Value</TableCell>
-                                <TableCell>{user.sector?.value}</TableCell>
-                            </TableRow>
-                        </TableBody>
-                    </Table>
+                    <Card>
+                        <CardHeader>
+                            <span className="text-start px-2">User Details</span>
+                        </CardHeader>
+                        <CardBody>
+                            <Table aria-label="User Data Table">
+                                <TableHeader>
+                                    <TableColumn>Fields</TableColumn>
+                                    <TableColumn>Values</TableColumn>
+                                </TableHeader>
+                                <TableBody>
+                                    <TableRow key="1">
+                                        <TableCell>Name</TableCell>
+                                        <TableCell>{user.user?.name}</TableCell>
+                                    </TableRow>
+                                    <TableRow key="2">
+                                        <TableCell>Terms & Conditions</TableCell>
+                                        <TableCell>{user.user?.acceptedTerms ? 'Accepted' : 'Rejected'}</TableCell>
+                                    </TableRow>
+                                    <TableRow key="3">
+                                        <TableCell>Sector</TableCell>
+                                        <TableCell>{user.sector?.label}</TableCell>
+                                    </TableRow>
+                                    <TableRow key="4">
+                                        <TableCell>Sector Value</TableCell>
+                                        <TableCell>{user.sector?.value}</TableCell>
+                                    </TableRow>
+                                </TableBody>
+                            </Table>
+                        </CardBody>
+                        <CardFooter>
+                            <div className="w-full flex items-center justify-end gap-2 px-2">
+                                <Button onPress={onOpen} variant="bordered">Edit</Button>
+                                <Button onPress={resetLocalStorage} color="danger">Forget</Button>
+                            </div>
+                        </CardFooter>
+                    </Card>
+                    <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
+                        <ModalContent>
+                            {(onClose) => (
+                                <>
+                                    <ModalHeader className="flex flex-col gap-1">Modal Title</ModalHeader>
+                                    <ModalBody>
+                                        <p>
+                                            Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                                            Nullam pulvinar risus non risus hendrerit venenatis.
+                                            Pellentesque sit amet hendrerit risus, sed porttitor quam.
+                                        </p>
+                                        <p>
+                                            Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                                            Nullam pulvinar risus non risus hendrerit venenatis.
+                                            Pellentesque sit amet hendrerit risus, sed porttitor quam.
+                                        </p>
+                                        <p>
+                                            Magna exercitation reprehenderit magna aute tempor cupidatat consequat elit
+                                            dolor adipisicing. Mollit dolor eiusmod sunt ex incididunt cillum quis.
+                                            Velit duis sit officia eiusmod Lorem aliqua enim laboris do dolor eiusmod.
+                                            Et mollit incididunt nisi consectetur esse laborum eiusmod pariatur
+                                            proident Lorem eiusmod et. Culpa deserunt nostrud ad veniam.
+                                        </p>
+                                    </ModalBody>
+                                    <ModalFooter>
+                                        <Button color="danger" variant="light" onPress={onClose}>
+                                            Close
+                                        </Button>
+                                        <Button color="primary" onPress={onClose}>
+                                            Action
+                                        </Button>
+                                    </ModalFooter>
+                                </>
+                            )}
+                        </ModalContent>
+                    </Modal>
                 </div>
             ) : (
                 <p>Loading user data...</p>
