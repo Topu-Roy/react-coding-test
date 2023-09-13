@@ -4,6 +4,8 @@ import { Button, Card, Input, Select, SelectItem, Modal, ModalContent, ModalHead
 import { useEffect, useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import toast from "react-hot-toast";
+import { redirect } from 'next/navigation'
+import { useUserStore } from "@/zustand/userStore";
 
 // * Types for this file
 type Inputs = {
@@ -28,6 +30,9 @@ const Form = () => {
     const [options, setOptions] = useState<OptionsType>([])
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
     const [formData, setFormData] = useState<InputsForAPI>();
+    const [isRedirect, setIsRedirect] = useState(false);
+
+    const { id, setId } = useUserStore();
 
     const {
         register,
@@ -107,6 +112,9 @@ const Form = () => {
                 },
             })
             if (response.ok) {
+
+                // * setting the id into local storage
+                formData && setId(formData.sectorId)
                 toast('Added Successfully',
                     {
                         icon: '👏',
@@ -117,11 +125,12 @@ const Form = () => {
                         },
                     }
                 );
+                setIsRedirect(true)
             }
         } catch (error) {
             toast('Something went wrong',
                 {
-                    icon: '👏',
+                    icon: '⛔',
                     style: {
                         borderRadius: '10px',
                         background: 'rgb(157 23 77)',
@@ -131,6 +140,17 @@ const Form = () => {
             );
         }
     }
+
+    // * Redirects to home page
+    useEffect(() => {
+
+        // * Redirect if new user is created
+        if (isRedirect) redirect('/home');
+
+        // * Redirect id is present in the local storage
+        if (id !== '') redirect('/home');
+
+    }, [isRedirect])
 
     return (
         <>
