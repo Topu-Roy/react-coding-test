@@ -60,13 +60,17 @@ const Form = () => {
                     name,
                     sector: optionObject?.id,
                     acceptedTerms
-                })
+                }),
+                headers: {
+                    "Content-Type": "application/json",
+                },
             })
         } catch (error) {
             console.log('something went wrong', error);
+        } finally {
+            console.log(data)
+            reset();
         }
-        console.log(data)
-        reset();
     }
 
 

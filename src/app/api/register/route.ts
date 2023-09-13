@@ -2,9 +2,9 @@ import { prisma } from "../../../../prisma/prismaClient";
 import { NextResponse } from "next/server";
 
 export const POST = async (req: Request) => {
-  const { name, sector, acceptedTerms } = await req.json();
+  const { name, sectorId, acceptedTerms } = await req.json();
 
-  if (!name || !sector || !acceptedTerms)
+  if (!name || !sectorId || !acceptedTerms)
     return NextResponse.json(
       { error: "All fields are required" },
       { status: 500 }
@@ -18,7 +18,7 @@ export const POST = async (req: Request) => {
         acceptedTerms,
         sector: {
           connect: {
-            id: sector,
+            id: sectorId,
           },
         },
       },
