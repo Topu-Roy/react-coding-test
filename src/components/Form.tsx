@@ -6,32 +6,16 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import toast from "react-hot-toast";
 import { redirect } from 'next/navigation'
 import { useUserStore } from "@/zustand/userStore";
+import { Inputs, InputsForAPI, OptionsType } from "@/types";
+import { createNewUser, fetchAllSectors, sortedObject } from "@/utils/fetch";
 
-// * Types for this file
-type Inputs = {
-    name: string;
-    sector: string;
-    acceptedTerms: boolean;
-};
-
-export type InputsForAPI = {
-    name: string;
-    sectorId: string;
-    acceptedTerms: boolean;
-};
-
-type OptionsType = {
-    id: string;
-    value: number;
-    label: string;
-}[]
 
 const Form = () => {
     const [options, setOptions] = useState<OptionsType>([])
-    const { isOpen, onOpen, onOpenChange } = useDisclosure();
     const [formData, setFormData] = useState<InputsForAPI>();
     const [isRedirect, setIsRedirect] = useState(false);
 
+    const { isOpen, onOpen, onOpenChange } = useDisclosure();
     const { obj, setObj } = useUserStore();
 
     const {
@@ -43,44 +27,10 @@ const Form = () => {
 
     // * Fetching the data from the database
     useEffect(() => {
-        async function fetchAllSectors() {
-            try {
-                const response = await fetch('/api/getAllSectors');
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                const result = await response.json();
-
-
-                // * Sorting the result by alphabetical order
-                const sortedSectorObjectDescending: OptionsType = result.sort((a: {
-                    id: string;
-                    value: number;
-                    label: string;
-                }, b: {
-                    id: string;
-                    value: number;
-                    label: string;
-                }) => {
-                    const labelA = a.label.toLowerCase();
-                    const labelB = b.label.toLowerCase();
-
-                    if (labelA < labelB) {
-                        return -1;
-                    }
-                    if (labelA > labelB) {
-                        return 1;
-                    }
-                    return 0;
-                });
-
-                // * Setting the stat
-                setOptions(sortedSectorObjectDescending);
-            } catch (error) {
-                console.error('Error fetching data:', error);
-            }
-        }
-        fetchAllSectors();
+        fetchAllSectors().then(data => {
+            const mySortedData = sortedObject(data);
+            setOptions(mySortedData)
+        })
     }, [])
 
     // * Form submission handler for validation
@@ -103,35 +53,24 @@ const Form = () => {
 
     // * Submit the form data to the backend
     async function handelContinue() {
-        try {
-            const response = await fetch('/api/register', {
-                method: 'POST',
-                body: JSON.stringify(formData),
-                headers: {
-                    "Content-Type": "application/json",
-                },
+        createNewUser(formData as InputsForAPI).then(() => {
+            formData && setObj({
+                name: formData.name,
+                sectorId: formData.sectorId,
+                acceptedTerms: formData.acceptedTerms
             })
-            if (response.ok) {
-
-                // * setting the id into local storage
-                formData && setObj({
-                    name: formData.name,
-                    sectorId: formData.sectorId,
-                    acceptedTerms: formData.acceptedTerms
-                })
-                toast('Added Successfully',
-                    {
-                        icon: '👏',
-                        style: {
-                            borderRadius: '10px',
-                            background: '#333',
-                            color: '#fff',
-                        },
-                    }
-                );
-                setIsRedirect(true)
-            }
-        } catch (error) {
+            toast('Added Successfully',
+                {
+                    icon: '👏',
+                    style: {
+                        borderRadius: '10px',
+                        background: '#333',
+                        color: '#fff',
+                    },
+                }
+            );
+            setIsRedirect(true)
+        }).catch(err => {
             toast('Something went wrong',
                 {
                     icon: '⛔',
@@ -142,7 +81,7 @@ const Form = () => {
                     },
                 }
             );
-        }
+        })
     }
 
     // * Redirects to home page

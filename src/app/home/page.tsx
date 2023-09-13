@@ -3,14 +3,8 @@ import { Button, Card, CardBody, CardFooter, CardHeader, Table, TableBody, Table
 import { useUserStore } from "@/zustand/userStore"
 import { useEffect, useState } from "react"
 import { redirect } from "next/navigation"
-import { UserDataType } from "@/utils/fetch"
-import { InputsForAPI } from "@/components/Form"
+import { InputsForAPI, UserDataType, UserDataTypeForFetchReq } from "@/types"
 
-
-type UserDataTypeForFetchReq = {
-    name: string
-    sectorId: string
-}
 
 function page() {
     const [user, setUser] = useState<UserDataType>()
@@ -105,11 +99,12 @@ function page() {
                             </div>
                         </CardFooter>
                     </Card>
+
                     <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
                         <ModalContent>
                             {(onClose) => (
                                 <>
-                                    <ModalHeader className="flex flex-col gap-1">Modal Title</ModalHeader>
+                                    <ModalHeader className="flex flex-col gap-1">Edit Details</ModalHeader>
                                     <ModalBody>
                                         <p>
                                             Lorem ipsum dolor sit amet, consectetur adipiscing elit.
