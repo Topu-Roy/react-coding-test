@@ -1,22 +1,32 @@
 "use client";
 
-import { Button, Card, Input, Select, SelectItem } from "@nextui-org/react";
+import { Button, Card, Input, Select, SelectItem, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure } from "@nextui-org/react";
 import { useEffect, useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 
+// * Types for this file
+type Inputs = {
+    name: string;
+    sector: string;
+    acceptedTerms: boolean;
+};
+
+type InputsForAPI = {
+    name: string;
+    sectorId: string;
+    acceptedTerms: boolean;
+};
+
+type OptionsType = {
+    id: string;
+    value: number;
+    label: string;
+}[]
+
 const Form = () => {
     const [options, setOptions] = useState<OptionsType>([])
-    type Inputs = {
-        name: string;
-        sector: string;
-        acceptedTerms: boolean;
-    };
-
-    type OptionsType = {
-        id: string;
-        value: number;
-        label: string;
-    }[]
+    const { isOpen, onOpen, onOpenChange } = useDisclosure();
+    const [formData, setFormData] = useState<InputsForAPI>();
 
     const {
         register,
@@ -24,8 +34,6 @@ const Form = () => {
         reset,
         formState: { errors, isSubmitting, isSubmitted },
     } = useForm<Inputs>();
-
-
 
     // * Fetching the data from the database
     useEffect(() => {
@@ -69,32 +77,38 @@ const Form = () => {
         fetchAllSectors();
     }, [])
 
-
     // * Form submission handler
     const onSubmit: SubmitHandler<Inputs> = async (data) => {
 
-        // * getting the id of the sector from the object
-        const optionObject = options.find(option => option.label === data.sector)
+        const { name, sector, acceptedTerms } = data;
 
-        const { name, acceptedTerms } = data;
+        // * getting the id of the sector from the object
+        const optionObject = options.find(option => option.label === sector)
+
+        if (optionObject) {
+            setFormData({
+                name,
+                sectorId: optionObject.id,
+                acceptedTerms
+            });
+            onOpen();
+        }
+    }
+
+    async function handelContinue() {
         try {
             const response = await fetch('/api/register', {
                 method: 'POST',
-                body: JSON.stringify({
-                    name,
-                    sectorId: optionObject?.id,
-                    acceptedTerms
-                }),
+                body: JSON.stringify(formData),
                 headers: {
                     "Content-Type": "application/json",
                 },
             })
             if (response.ok) {
-                reset();
-                console.log("Registered successfully")
+                console.log('added to database')
             }
         } catch (error) {
-            console.log('something went wrong', error);
+            console.log('failed to add to database')
         }
     }
 
@@ -156,28 +170,42 @@ const Form = () => {
                         </div>
                     </div>
                     <div className="w-full flex justify-end items-center">
-                        <Button type="submit" className="">
+                        <Button type="submit">
                             Save
                         </Button>
                     </div>
                 </Card>
+                <Modal isOpen={isOpen} onOpenChange={onOpenChange} backdrop="blur">
+                    <ModalContent>
+                        {(onClose) => (
+                            <>
+                                <ModalHeader className="flex flex-col gap-1">Modal Title</ModalHeader>
+                                <ModalBody>
+
+                                </ModalBody>
+                                <ModalFooter>
+                                    <Button color="danger" variant="light" onPress={onClose}>
+                                        Cancel
+                                    </Button>
+                                    <Button color="primary" onPress={() => {
+
+                                        handelContinue();
+
+                                        if (isSubmitted === true) {
+                                            reset();
+                                            onClose();
+                                        }
+                                    }}>
+                                        Continue
+                                    </Button>
+                                </ModalFooter>
+                            </>
+                        )}
+                    </ModalContent>
+                </Modal>
             </form>
         </>
     );
 };
 
 export default Form;
-
-
-// With Plain HTML
-// <select
-//   placeholder="Select an animal"
-//   className="max-w-xs py-2 px-2 rounded-md"
-//   onSelect={() => console.log('Select an animal')}
-// >
-//   {options.map(item => (
-//     <option onClick={() => console.log(item.label)} key={item.value} value={item.label}>
-//       {item.label}
-//     </option>
-//   ))}
-// </select>
