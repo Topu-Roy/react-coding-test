@@ -1,8 +1,8 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "../../../../prisma/prismaClient";
 
-export const POST = async (req: Request) => {
-  const { userId } = await req.json();
+export const POST = async (req: NextRequest) => {
+  const userId = req.nextUrl.searchParams.get("userId");
 
   if (!userId) {
     return NextResponse.json(
@@ -15,7 +15,7 @@ export const POST = async (req: Request) => {
     await prisma.$connect();
     const user = await prisma.user.findFirst({
       where: {
-        id: userId,
+        id: userId.toString(),
       },
     });
 
