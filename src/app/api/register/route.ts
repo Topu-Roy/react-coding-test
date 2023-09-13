@@ -2,34 +2,32 @@ import { prisma } from "../../../../prisma/prismaClient";
 import { NextResponse } from "next/server";
 
 export const POST = async (req: Request) => {
-  const { name, sectorId, sector, acceptedTerms } = await req.json();
+  const { name, sectorId, acceptedTerms } = await req.json();
 
-  if (!name || !sectorId || !acceptedTerms || !sector) {
+  if (!name || !sectorId || !acceptedTerms) {
     return NextResponse.json(
       { error: "All fields are required" },
       { status: 500 }
     );
   }
 
-  // return NextResponse.json({ name, sectorId, acceptedTerms });
-
-  console.log(name, sectorId, acceptedTerms);
-
   try {
-    await prisma.$connect();
+    prisma.$connect();
 
-    const selectedSector = await prisma.sector.findUnique({
+    // * Verify the sector from the database
+    const sectorFromDB = await prisma.sector.findUnique({
       where: {
         id: sectorId,
       },
     });
 
-    if (selectedSector) {
+    //* Proceed if the fetch request was successful
+    if (sectorFromDB) {
       await prisma.user.create({
         data: {
           name,
           acceptedTerms,
-          sectorName: selectedSector?.label,
+          sectorName: sectorFromDB.label,
           sectorID: {
             connect: {
               id: sectorId,
@@ -37,19 +35,17 @@ export const POST = async (req: Request) => {
           },
         },
       });
+
+      return NextResponse.json(
+        { message: "Successfully created user." },
+        { status: 200 }
+      );
+    } else {
+      return NextResponse.json({ message: "Response is not ok" });
     }
-
-    console.log(name, sectorId, acceptedTerms);
-
-    console.log("added successfully");
-    return NextResponse.json({ message: "Added To Database" }, { status: 200 });
-  } catch (err) {
-    console.log(err);
-    return NextResponse.json(
-      { error: "Error adding to database" },
-      { status: 500 }
-    );
+  } catch (error) {
+    return NextResponse.json({ message: "Fetch to Database Failed" });
   } finally {
-    await prisma.$disconnect();
+    prisma.$disconnect();
   }
 };
