@@ -3,6 +3,7 @@
 import { Button, Card, Input, Select, SelectItem, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure } from "@nextui-org/react";
 import { useEffect, useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
+import toast from "react-hot-toast";
 
 // * Types for this file
 type Inputs = {
@@ -77,7 +78,7 @@ const Form = () => {
         fetchAllSectors();
     }, [])
 
-    // * Form submission handler
+    // * Form submission handler for validation
     const onSubmit: SubmitHandler<Inputs> = async (data) => {
 
         const { name, sector, acceptedTerms } = data;
@@ -95,6 +96,7 @@ const Form = () => {
         }
     }
 
+    // * Submit the form data to the backend
     async function handelContinue() {
         try {
             const response = await fetch('/api/register', {
@@ -105,10 +107,28 @@ const Form = () => {
                 },
             })
             if (response.ok) {
-                console.log('added to database')
+                toast('Added Successfully',
+                    {
+                        icon: '👏',
+                        style: {
+                            borderRadius: '10px',
+                            background: '#333',
+                            color: '#fff',
+                        },
+                    }
+                );
             }
         } catch (error) {
-            console.log('failed to add to database')
+            toast('Something went wrong',
+                {
+                    icon: '👏',
+                    style: {
+                        borderRadius: '10px',
+                        background: 'rgb(157 23 77)',
+                        color: '#fff',
+                    },
+                }
+            );
         }
     }
 
@@ -179,9 +199,9 @@ const Form = () => {
                     <ModalContent>
                         {(onClose) => (
                             <>
-                                <ModalHeader className="flex flex-col gap-1">Modal Title</ModalHeader>
+                                <ModalHeader className="flex flex-col gap-1">Confirm to save the data</ModalHeader>
                                 <ModalBody>
-
+                                    After you confirm, a unique user will be created with the data you provided and saved on the database.
                                 </ModalBody>
                                 <ModalFooter>
                                     <Button color="danger" variant="light" onPress={onClose}>
@@ -196,7 +216,7 @@ const Form = () => {
                                             onClose();
                                         }
                                     }}>
-                                        Continue
+                                        Confirm
                                     </Button>
                                 </ModalFooter>
                             </>
