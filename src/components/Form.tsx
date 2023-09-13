@@ -33,8 +33,19 @@ const Form = () => {
         })
     }, [])
 
+    // * Redirects to home page
+    useEffect(() => {
+
+        // * Redirect if new user is created
+        if (isRedirect) redirect('/home');
+
+        // * Redirect if data is present in the local storage
+        if (obj.name !== '' && obj.sectorId !== '' && obj === undefined) redirect('/home');
+
+    }, [isRedirect])
+
     // * Form submission handler for validation
-    const onSubmit: SubmitHandler<Inputs> = async (data) => {
+    const onSubmit: SubmitHandler<Inputs> = (data) => {
 
         const { name, sector, acceptedTerms } = data;
 
@@ -52,7 +63,7 @@ const Form = () => {
     }
 
     // * Submit the form data to the backend
-    async function handelContinue() {
+    function handelContinue() {
         createNewUser(formData as InputsForAPI).then(() => {
             formData && setObj({
                 name: formData.name,
@@ -83,17 +94,6 @@ const Form = () => {
             );
         })
     }
-
-    // * Redirects to home page
-    useEffect(() => {
-
-        // * Redirect if new user is created
-        if (isRedirect) redirect('/home');
-
-        // * Redirect if id is present in the local storage
-        if (obj.name !== '' && obj.sectorId !== '' && obj === undefined) redirect('/home');
-
-    }, [isRedirect])
 
     return (
         <>
