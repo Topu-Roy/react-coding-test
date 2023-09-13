@@ -1,4 +1,5 @@
 "use client";
+
 import { Button, Card, Input, Select, SelectItem } from "@nextui-org/react";
 import { useEffect, useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
@@ -52,19 +53,24 @@ const Form = () => {
         // * getting the id of the sector from the object
         const optionObject = options.find(option => option.label === data.sector)
 
+        console.log(optionObject?.id)
+
         const { name, acceptedTerms } = data;
         try {
-            await fetch('/api/register', {
+            const response = await fetch('/api/register', {
                 method: 'POST',
                 body: JSON.stringify({
                     name,
-                    sector: optionObject?.id,
+                    sectorId: optionObject?.id,
                     acceptedTerms
                 }),
                 headers: {
                     "Content-Type": "application/json",
                 },
             })
+            if (response.ok) {
+                console.log(response.json())
+            }
         } catch (error) {
             console.log('something went wrong', error);
         } finally {
