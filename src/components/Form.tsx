@@ -37,8 +37,31 @@ const Form = () => {
                 }
                 const result = await response.json();
 
-                // * Setting the state
-                setOptions(result);
+
+                // * Sorting the result by alphabetical order
+                const sortedSectorObjectDescending: OptionsType = result.sort((a: {
+                    id: string;
+                    value: number;
+                    label: string;
+                }, b: {
+                    id: string;
+                    value: number;
+                    label: string;
+                }) => {
+                    const labelA = a.label.toLowerCase();
+                    const labelB = b.label.toLowerCase();
+
+                    if (labelA < labelB) {
+                        return -1;
+                    }
+                    if (labelA > labelB) {
+                        return 1;
+                    }
+                    return 0;
+                });
+
+                // * Setting the stat
+                setOptions(sortedSectorObjectDescending);
             } catch (error) {
                 console.error('Error fetching data:', error);
             }
@@ -52,8 +75,6 @@ const Form = () => {
 
         // * getting the id of the sector from the object
         const optionObject = options.find(option => option.label === data.sector)
-
-        console.log(optionObject?.id)
 
         const { name, acceptedTerms } = data;
         try {
@@ -69,18 +90,13 @@ const Form = () => {
                 },
             })
             if (response.ok) {
-                console.log(response.json())
+                reset();
+                console.log("Registered successfully")
             }
         } catch (error) {
             console.log('something went wrong', error);
-        } finally {
-            console.log(data)
-            reset();
         }
     }
-
-
-    // console.log(options)
 
     return (
         <>
