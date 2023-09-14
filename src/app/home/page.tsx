@@ -157,11 +157,11 @@ function page() {
 
     useEffect(() => {
 
-        if (user?.sector.id !== newSector?.id) {
+        if (user?.sector.id !== newSector?.id || user?.user.name !== validatedData?.name) {
             updateUser()
         }
 
-    }, [newSector])
+    }, [newSector, validatedData])
 
 
     return (

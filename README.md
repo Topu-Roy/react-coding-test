@@ -4,7 +4,7 @@ This is a React project made with [Next.js](https://nextjs.org/) by [Topu Roy](h
 
 ## Deployed on Vercel
 
-See the live deployed website [here](#)
+See the live deployed website [here](https://next-prisma-app.vercel.app)
 
 ## About This Project
 
