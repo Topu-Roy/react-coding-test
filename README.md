@@ -8,11 +8,11 @@ This project is a full stack nextjs web application focused on CRUD operations o
 
 **Dark Mode Support**
 
-![Alt text](public/Dark.jpg)
+![image](public/Dark.jpg)
 
 **Light Mode Support**
 
-[Alt text](public/Light.jpg)
+[image](public/Light.jpg)
 
 ## Technologies used in this project
 
