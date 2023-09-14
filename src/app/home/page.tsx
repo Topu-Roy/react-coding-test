@@ -176,7 +176,7 @@ function page() {
                                 size="md"
                                 aria-label="Tabs form"
                                 selectedKey={selected}
-                                onSelectionChange={setSelected}
+                                onSelectionChange={() => setSelected}
                             >
                                 <Tab key="data" title="Data">
                                     <Table aria-label="User Data Table" className="w-[18rem] sm:w-[21rem] md:w-[25rem]">
