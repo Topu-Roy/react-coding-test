@@ -170,7 +170,11 @@ function page() {
     }, [options, validatedData])
 
     useEffect(() => {
-        updateUser()
+
+        if (user?.sector.id !== newSector?.id) {
+            updateUser()
+        }
+
     }, [newSector])
 
 
