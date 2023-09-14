@@ -136,7 +136,7 @@ function page() {
                         </CardFooter>
                     </Card>
 
-                    <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
+                    <Modal isOpen={isOpen} backdrop="blur" onOpenChange={onOpenChange}>
                         <form onSubmit={handleSubmit(onSubmit)}>
 
                             <ModalContent>
@@ -147,6 +147,7 @@ function page() {
                                             <Card className="p-4 pt-6 flex items-center max-w-lg min-w-[25rem] justify-center flex-col gap-2">
                                                 <div className="w-full">
                                                     <Input
+                                                        defaultValue={user.user.name}
                                                         {...register("name", { required: true })}
                                                         variant="bordered"
                                                         color={errors?.name ? "danger" : "default"}
@@ -155,6 +156,7 @@ function page() {
                                                     />
                                                 </div>
                                                 <Select
+                                                    defaultSelectedKeys={[user.sector.label]}
                                                     items={options}
                                                     label="Sector"
                                                     color={errors?.sector ? "danger" : "default"}
