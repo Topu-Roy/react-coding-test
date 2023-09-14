@@ -97,11 +97,11 @@ const Form = () => {
 
     return (
         <>
-            <span className="font-bold text-2xl pb-8">
+            <span className="font-bold text-3xl px-4 text-center md:px-0 pb-8">
                 Please enter your information
             </span>
             <form onSubmit={handleSubmit(onSubmit)}>
-                <Card className="p-4 pt-6 flex items-center max-w-lg min-w-[25rem] justify-center flex-col gap-2">
+                <Card className="p-4 pt-6 flex items-center max-w-lg min-w-[20rem] sm:min-w-[25rem] justify-center flex-col gap-2">
                     <div className="w-full">
                         <Input
                             {...register("name", { required: true })}
@@ -158,13 +158,14 @@ const Form = () => {
                         </Button>
                     </div>
                 </Card>
-                <Modal isOpen={isOpen} onOpenChange={onOpenChange} backdrop="blur">
+                <Modal isOpen={isOpen} onOpenChange={onOpenChange} backdrop="opaque">
                     <ModalContent>
                         {(onClose) => (
                             <>
                                 <ModalHeader className="flex flex-col gap-1">Confirm to save the data</ModalHeader>
                                 <ModalBody>
                                     After you confirm, a unique user will be created with the data you provided and saved on the database.
+                                    <span className="italic text-sm text-gray-700/70 dark:text-white/60">Note: You can edit your information even after you confirm.</span>
                                 </ModalBody>
                                 <ModalFooter>
                                     <Button color="danger" variant="light" onPress={onClose}>
