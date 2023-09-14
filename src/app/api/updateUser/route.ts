@@ -27,7 +27,7 @@ export const PATCH = async (req: Request) => {
 
     try {
       const { id, label } = targetedSector;
-      const updatedUser = await prisma.user.update({
+      await prisma.user.update({
         where: {
           id: userId,
         },
@@ -43,7 +43,12 @@ export const PATCH = async (req: Request) => {
       });
 
       // * Returning the updated user
-      return NextResponse.json({ updatedUser }, { status: 200 });
+      return NextResponse.json(
+        {
+          message: "Successfully updated the information",
+        },
+        { status: 200 }
+      );
     } catch (error) {
       return NextResponse.json({ message: "Error updating" }, { status: 500 });
     }

@@ -3,72 +3,36 @@ import { Button, Card, CardBody, CardFooter, CardHeader, Table, TableBody, Table
 import { useUserStore } from "@/zustand/userStore"
 import { useEffect, useState } from "react"
 import { redirect } from "next/navigation"
-import { Inputs, InputsForAPI, OptionsType, UserDataType, UserDataTypeForFetchReq } from "@/types"
+import { Inputs, OptionsType, UserDataType, UserDataTypeForFetchReq } from "@/types"
 import { SubmitHandler, useForm } from "react-hook-form"
 import { fetchAllSectors, sortedObject } from "@/utils/fetch"
+import toast from "react-hot-toast"
 
+type SectorType = {
+    id: string;
+    value: number;
+    label: string;
+}
 
 function page() {
     const [user, setUser] = useState<UserDataType>()
     const [options, setOptions] = useState<OptionsType>()
-    const [newOptions, setNewOptions] = useState<Inputs>()
+    const [validatedData, setValidatedData] = useState<Inputs>()
+    const [newSector, setNewSector] = useState<SectorType>()
 
     const { setObj, obj } = useUserStore()
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
-    let myObj: InputsForAPI | undefined;
-
     const {
         register,
         handleSubmit,
-        reset,
         formState: { errors, isSubmitted },
     } = useForm<Inputs>();
 
+    // * Redirect
     useEffect(() => {
-        if (obj?.name === '' && obj.sectorId === '') redirect('/')
-        myObj = obj;
+        if (obj.name === '' || obj.sectorId === '') redirect('/')
     }, [obj])
-
-    useEffect(() => {
-        // * Fetch data from the server
-        async function fetchSingleUser(data: UserDataTypeForFetchReq) {
-            try {
-                const req = await fetch("api/getSingleUser", {
-                    method: 'POST',
-                    body: JSON.stringify(data)
-                });
-
-                if (!req.ok) {
-                    throw new Error(`HTTP error! Status: ${req.status}`);
-                }
-
-                const res = await req.json();
-                return res;
-
-            } catch (error) {
-                console.error("Error fetching data:", error);
-                throw error;
-            }
-        }
-
-        // * setting the state with the result
-        if (myObj !== undefined && myObj !== null) {
-            try {
-                const data = fetchSingleUser({ name: myObj.name, sectorId: myObj.sectorId });
-                data.then((data) => setUser(data as any))
-            } catch (error) {
-                console.error("Error handling user data:", error);
-            }
-        }
-    }, [myObj])
-
-    useEffect(() => {
-        fetchAllSectors().then((data) => {
-            const sortedObjects = sortedObject(data);
-            setOptions(sortedObjects)
-        })
-    }, []);
 
     function resetLocalStorage() {
         setObj({
@@ -78,21 +42,144 @@ function page() {
         })
     }
 
-    // * Checking validation of the fields
-    const onSubmit: SubmitHandler<Inputs> = (data) => {
-        const { name, sector, acceptedTerms } = data;
-
-        // * setting the validated data
-        setNewOptions({
-            name,
-            sector,
-            acceptedTerms
+    useEffect(() => {
+        fetchAllSectors().then((data) => {
+            const sortedObjects = sortedObject(data);
+            setOptions(sortedObjects)
         })
+    }, []);
 
-        console.log(newOptions)
+    async function fetchSingleUser(data: UserDataTypeForFetchReq) {
+        try {
+            const req = await fetch("api/getSingleUser", {
+                method: 'POST',
+                body: JSON.stringify(data)
+            });
+
+            if (!req.ok) {
+                throw new Error(`HTTP error! Status: ${req.status}`);
+            }
+
+            const res = await req.json();
+            return res;
+
+        } catch (error) {
+            console.error("Error fetching data:", error);
+            throw error;
+        }
+    }
+    useEffect(() => {
+        try {
+            const data = fetchSingleUser({ name: obj.name, sectorId: obj.sectorId });
+            data.then((data) => setUser(data as any))
+            // toast('Got the user information',
+            //     {
+            //         icon: '✅',
+            //         style: {
+            //             borderRadius: '10px',
+            //             background: 'rgb(157 23 77)',
+            //             color: '#fff',
+            //         },
+            //     }
+            // );
+        } catch (error) {
+            console.error("Error handling user data:", error);
+            toast('Could get user data',
+                {
+                    icon: '⛔',
+                    style: {
+                        borderRadius: '10px',
+                        background: 'rgb(157 23 77)',
+                        color: '#fff',
+                    },
+                }
+            );
+        }
+    }, [obj])
+
+    async function updateUser() {
+
+        // if (validatedData === undefined || user === undefined || newSector === undefined) return
+
+        const res = await fetch('/api/updateUser', {
+            method: "PATCH",
+            body: JSON.stringify({
+                userId: user?.user.id,
+                newName: validatedData?.name,
+                newSectorId: newSector?.id
+            })
+        });
+
+        if (res.ok) {
+
+            if (validatedData === undefined || user === undefined || newSector === undefined) return
+
+            setObj({
+                name: validatedData.name,
+                sectorId: newSector.id,
+                acceptedTerms: validatedData.acceptedTerms
+            })
+
+            toast('Updated Successfully', {
+                icon: '✅',
+                style: {
+                    borderRadius: '10px',
+                    background: '#333',
+                    color: '#fff',
+                },
+            });
+        }
     }
 
-    async function updateData() { }
+    useEffect(() => {
+        if (options === undefined || validatedData === undefined) return;
+        const sector = options.find((option) => option.label === validatedData.sector);
+        setNewSector(sector)
+
+    }, [options, validatedData])
+
+    useEffect(() => {
+        try {
+            updateUser();
+        } catch (e) {
+            toast('Something went wrong',
+                {
+                    icon: '⛔',
+                    style: {
+                        borderRadius: '10px',
+                        background: 'rgb(157 23 77)',
+                        color: '#fff',
+                    },
+                }
+            );
+        }
+    }, [validatedData]);
+
+    const onSubmit: SubmitHandler<Inputs> = async (data) => {
+
+        setValidatedData({
+            name: data.name,
+            sector: data.sector,
+            acceptedTerms: data.acceptedTerms
+        })
+
+        // try {
+        //     await updateUser();
+        // } catch (e) {
+        //     toast('Something went wrong',
+        //         {
+        //             icon: '⛔',
+        //             style: {
+        //                 borderRadius: '10px',
+        //                 background: 'rgb(157 23 77)',
+        //                 color: '#fff',
+        //             },
+        //         }
+        //     );
+        // }
+
+    }
+
 
     return (
         <div className="flex justify-center min-h-screen flex-col items-center">
@@ -197,23 +284,14 @@ function page() {
                                                         </label>
                                                     </div>
                                                 </div>
-                                                <div className="w-full flex justify-end items-center">
-                                                    <Button type="submit">
-                                                        Save
-                                                    </Button>
-                                                </div>
                                             </Card>
                                         </ModalBody>
                                         <ModalFooter>
-                                            <Button color="danger" variant="light" onPress={onClose}>
+                                            <Button color="default" variant="ghost" onPress={onClose}>
                                                 Close
                                             </Button>
-                                            <Button color="primary" onPress={() => {
-
-                                                updateData();
-
+                                            <Button type="submit" color="primary" onPress={() => {
                                                 if (isSubmitted === true) {
-                                                    reset();
                                                     onClose();
                                                 }
                                             }}>
@@ -234,4 +312,4 @@ function page() {
     )
 }
 
-export default page
+export default page;

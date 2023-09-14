@@ -171,7 +171,6 @@ const Form = () => {
                                         Cancel
                                     </Button>
                                     <Button color="primary" onPress={() => {
-
                                         handelContinue();
 
                                         if (isSubmitted === true) {

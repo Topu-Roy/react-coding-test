@@ -17,6 +17,12 @@ export type OptionsType = {
   label: string;
 }[];
 
+export type OptionType = {
+  id: string;
+  value: number;
+  label: string;
+};
+
 export type UserDataType = {
   user: {
     id: string;

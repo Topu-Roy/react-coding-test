@@ -1,4 +1,4 @@
-import { InputsForAPI } from "@/components/Form";
+import { InputsForAPI } from "@/types";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
