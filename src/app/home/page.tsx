@@ -1,27 +1,19 @@
 'use client'
+
 import { Button, Card, CardBody, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Input, Select, SelectItem, Tab, Tabs, Skeleton } from "@nextui-org/react"
 import { useUserStore } from "@/zustand/userStore"
 import { useEffect, useState } from "react"
 import { redirect } from "next/navigation"
-import { Inputs, OptionsType, UserDataType, UserDataTypeForFetchReq } from "@/types"
+import { Inputs, OptionsType, SectorType, UserDataType, UserDataTypeForFetchReq } from "@/types"
 import { SubmitHandler, useForm } from "react-hook-form"
 import { fetchAllSectors, sortedObject } from "@/utils/fetch"
 import toast from "react-hot-toast"
-
-type SectorType = {
-    id: string;
-    value: number;
-    label: string;
-}
 
 function page() {
     const [user, setUser] = useState<UserDataType>()
     const [options, setOptions] = useState<OptionsType>()
     const [validatedData, setValidatedData] = useState<Inputs>()
     const [newSector, setNewSector] = useState<SectorType>()
-
-    // * To avoid infinite loop
-    const [prevSector, setPrevSector] = useState<SectorType>()
 
     const { setObj, obj } = useUserStore()
     const [selected, setSelected] = useState("data");
@@ -77,7 +69,6 @@ function page() {
             const data = fetchSingleUser({ name: obj.name, sectorId: obj.sectorId });
             data.then((data) => setUser(data as any))
         } catch (error) {
-            console.error("Error handling user data:", error);
             toast('Could get user data',
                 {
                     icon: '⛔',
@@ -109,9 +100,7 @@ function page() {
             try {
                 const data = fetchSingleUser({ name: validatedData.name, sectorId: newSector.id });
                 data.then((data) => setUser(data as any))
-                console.log('added new data to user')
-            } catch (error) {
-                console.error("Error handling user data:", error);
+            } catch (e) {
                 toast('Could get user data',
                     {
                         icon: '⛔',
@@ -144,8 +133,6 @@ function page() {
         };
 
         setValidatedData(newData);
-
-
     }
 
     useEffect(() => {
@@ -179,10 +166,10 @@ function page() {
 
 
     return (
-        <div className="flex justify-center min-h-screen flex-col items-center">
+        <div className="flex justify-start sm:justify-center pt-8 sm:pt-0 min-h-screen flex-col items-center">
             {user ? (
-                <div className="flex justify-center items-center flex-col w-full">
-                    <Card className="max-w-full min-w-[25rem] h-[25rem]">
+                <div className="flex justify-center items-center flex-col w-full px-2">
+                    <Card className="max-w-full min-w-[15rem] sm:min-w-[25rem] sm:h-[25rem]">
                         <CardBody className="overflow-hidden">
                             <Tabs
                                 fullWidth
@@ -192,7 +179,7 @@ function page() {
                                 onSelectionChange={setSelected}
                             >
                                 <Tab key="data" title="Data">
-                                    <Table aria-label="User Data Table" className="w-full">
+                                    <Table aria-label="User Data Table" className="w-[18rem] sm:w-[21rem] md:w-[25rem]">
                                         <TableHeader>
                                             <TableColumn>Fields</TableColumn>
                                             <TableColumn>Values</TableColumn>
@@ -221,7 +208,7 @@ function page() {
                                     </div>
                                 </Tab>
                                 <Tab key="edit" title="Edit">
-                                    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4 h-[300px] p-4 pt-6 items-center max-w-lg w-full justify-center">
+                                    <form onSubmit={handleSubmit(onSubmit)} className="flex w-[18rem] sm:w-[21rem] md:w-[25rem] flex-col gap-4 h-[300px] py-4 pt-6 items-center justify-center">
 
                                         <div className="w-full">
                                             <Input
@@ -231,9 +218,13 @@ function page() {
                                                 color={errors?.name ? "danger" : "default"}
                                                 type="text"
                                                 label="Name"
+                                                size="md"
+                                                className="w-full"
                                             />
                                         </div>
                                         <Select
+                                            size="md"
+                                            className="w-full"
                                             defaultSelectedKeys={[user.sector.label]}
                                             items={options}
                                             label="Sector"
@@ -248,7 +239,7 @@ function page() {
                                                 </SelectItem>
                                             )}
                                         </Select>
-                                        <div className="w-full py-4">
+                                        <div className="w-full py-4 px-2">
                                             <div className="flex items-center">
                                                 <input
                                                     {...register("acceptedTerms", { required: true })}
@@ -260,7 +251,7 @@ function page() {
                                                 />
                                                 <label
                                                     htmlFor="link-checkbox"
-                                                    className="ml-2 flex gap-1 justify-center items-center text-sm font-medium  dark:text-gray-300 text-gray-900/80"
+                                                    className="ml-2 flex gap-1 justify-center items-center text-xs sm:text-sm font-medium  dark:text-gray-300 text-gray-900/80"
                                                 >
                                                     {errors?.acceptedTerms ? (
                                                         <span className="text-rose-600/90">
@@ -269,7 +260,7 @@ function page() {
                                                     ) : (
                                                         "I agree with the"
                                                     )}
-                                                    <p className="text-blue-600 dark:text-blue-500 hover:underline">
+                                                    <p className="text-blue-600 text-xs sm:text-sm dark:text-blue-500 hover:underline">
                                                         terms and conditions
                                                     </p>
                                                 </label>
@@ -291,21 +282,25 @@ function page() {
                     </Card>
                 </div>
             ) : (
-                <Card className="w-[200px] space-y-5 p-4" radius="md">
-                    <Skeleton className="rounded-lg">
-                        <div className="h-24 rounded-lg bg-default-300"></div>
-                    </Skeleton>
-                    <div className="space-y-3">
-                        <Skeleton className="w-3/5 rounded-lg">
-                            <div className="h-3 w-3/5 rounded-lg bg-default-200"></div>
-                        </Skeleton>
-                        <Skeleton className="w-4/5 rounded-lg">
-                            <div className="h-3 w-4/5 rounded-lg bg-default-200"></div>
-                        </Skeleton>
-                        <Skeleton className="w-2/5 rounded-lg">
-                            <div className="h-3 w-2/5 rounded-lg bg-default-300"></div>
+                <Card className="w-[18rem] sm:w-[21rem] md:w-[25rem] space-y-5 p-4" radius="md">
+                    <div className="w-full flex justify-center items-center">
+                        <Skeleton className="w-full rounded-lg">
+                            <div className="h-8 rounded-lg bg-default-200"></div>
                         </Skeleton>
                     </div>
+
+                    <div className="w-full flex justify-center items-center">
+                        <Skeleton className="w-full rounded-lg">
+                            <div className="h-[18rem] rounded-lg bg-default-300"></div>
+                        </Skeleton>
+                    </div>
+
+                    <div className="flex w-full justify-end items-center">
+                        <Skeleton className="rounded-lg w-2/5">
+                            <div className="h-10 rounded-lg bg-default-300"></div>
+                        </Skeleton>
+                    </div>
+
                 </Card>
             )}
 

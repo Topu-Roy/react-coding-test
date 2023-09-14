@@ -42,3 +42,9 @@ export type UserDataTypeForFetchReq = {
   name: string;
   sectorId: string;
 };
+
+export type SectorType = {
+  id: string;
+  value: number;
+  label: string;
+};
