@@ -109,6 +109,7 @@ const Form = () => {
                             color={errors?.name ? "danger" : "default"}
                             type="text"
                             label="Name"
+                            autoComplete="off"
                         />
                     </div>
                     <Select

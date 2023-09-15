@@ -217,6 +217,7 @@ function page() {
                                                 label="Name"
                                                 size="md"
                                                 className="w-full"
+                                                autoComplete="off"
                                             />
                                         </div>
                                         <Select
